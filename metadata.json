@@ -1,0 +1,5 @@
+{
+  "name": "Copy of نسخة",
+  "description": "An intelligent assistant that answers questions based on the content of a pre-loaded Arabic PDF document, using the Gemini API for Retrieval-Augmented Generation.",
+  "requestFramePermissions": []
+}
