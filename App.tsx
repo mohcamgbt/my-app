@@ -39,33 +39,44 @@ function toLegalArabicOrdinal(num: number): string {
     const units = ["", "الأولى", "الثانية", "الثالثة", "الرابعة", "الخامسة", "السادسة", "السابعة", "الثامنة", "التاسعة"];
     
     if (num >= 1 && num <= 9) return units[num];
+    
     if (num === 10) return "العاشرة";
+    
     if (num >= 11 && num <= 19) {
         const idx = num - 10;
         const teensList = ["العاشرة", "الحادية عشرة", "الثانية عشرة", "الثالثة عشرة", "الرابعة عشرة", "الخامسة عشرة", "السادسة عشرة", "السابعة عشرة", "الثامنة عشرة", "التاسعة عشرة"];
         return teensList[idx];
     }
+
     const tens = ["", "العاشرة", "العشرون", "الثلاثون", "الأربعون", "الخمسون", "الستون", "السبعون", "الثمانون", "التسعون"];
+
     if (num >= 20 && num <= 99) {
         const unit = num % 10;
         const ten = Math.floor(num / 10);
         if (unit === 0) return tens[ten];
+        
         let unitStr = units[unit];
         if (unit === 1) unitStr = "الحادية"; 
+        
         return `${unitStr} و${tens[ten]}`;
     }
+
     if (num === 100) return "المائة";
+    
     if (num > 100 && num < 200) {
         const remainder = num - 100;
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد المائة`;
     }
+
     if (num === 200) return "المائتان";
+
     if (num > 200 && num < 300) {
         const remainder = num - 200;
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد المائتين`;
     }
+
     const hundredsMap: { [key: number]: string } = {
         300: "الثلاثمائة",
         400: "الأربعمائة",
@@ -75,14 +86,18 @@ function toLegalArabicOrdinal(num: number): string {
         800: "الثمانمائة",
         900: "التسعمائة"
     };
+
     if (num >= 300 && num < 1000) {
         const hundreds = Math.floor(num / 100) * 100;
         const remainder = num - hundreds;
         const hundredsStr = hundredsMap[hundreds];
+        
         if (remainder === 0) return hundredsStr;
+        
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد ${hundredsStr}`;
     }
+    
     return num.toString();
 }
 
@@ -223,9 +238,11 @@ const App: React.FC = () => {
             isFirstChunk = false;
         } else {
             setMessages((prev) => {
+                // Find the message with the matching ID and update it
+                // This avoids the "undefined" error if state was cleared or changed
                 const messageIndex = prev.findIndex(msg => msg.id === modelMessageId);
                 
-                if (messageIndex === -1) return prev; 
+                if (messageIndex === -1) return prev; // Message not found (maybe state cleared), do nothing
 
                 const newMessages = [...prev];
                 const msgToUpdate = newMessages[messageIndex];
@@ -252,7 +269,7 @@ const App: React.FC = () => {
   };
   
   return (
-    <div className="flex h-screen bg-white text-gray-800 font-sans overflow-hidden">
+    <div className="flex h-[100dvh] bg-white text-gray-800 font-sans overflow-hidden supports-[height:100dvh]:h-[100dvh] supports-[height:100svh]:h-[100svh]">
         {/* Sidebar */}
         <DocumentSidebar 
           documents={documents}
@@ -317,7 +334,7 @@ const App: React.FC = () => {
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-3">مرحباً، أنا محكم</h2>
                         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
-                            مساعدك القانوني. اسألني عن الأنظمة السعودية وسأجيبك بدقة مع الاستشهاد بالمواد النظامية.
+                            مساعدك القانوني الذكي. اسألني عن الأنظمة السعودية وسأجيبك بدقة مع الاستشهاد بالمواد النظامية.
                         </p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
@@ -325,17 +342,17 @@ const App: React.FC = () => {
                                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الحضانة</span>
                                  <span className="text-xs text-gray-400">"ما هي شروط الحضانة؟"</span>
                              </button>
-                             <button onClick={() => handleSendMessage("أذكر لي جميع المواد المتعلقة بالحجر والإفلاس")} className="group p-4 text-right bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-2xl transition-all shadow-sm hover:shadow-md">
-                                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الحجر والإفلاس</span>
-                                 <span className="text-xs text-gray-400">"أذكر لي جميع المواد المتعلقة بالحجر والإفلاس"</span>
+                             <button onClick={() => handleSendMessage("كيف يتم توزيع الميراث؟")} className="group p-4 text-right bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-2xl transition-all shadow-sm hover:shadow-md">
+                                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الميراث</span>
+                                 <span className="text-xs text-gray-400">"كيف يتم توزيع الميراث؟"</span>
                              </button>
                         </div>
                     </div>
                 )}
             </div>
             
-            {/* Input Area */}
-            <div className="w-full flex justify-center p-4 bg-white pt-2">
+            {/* Input Area - Updated with safe area padding */}
+            <div className="w-full flex justify-center p-4 bg-white pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                  <ChatInput onSendMessage={handleSendMessage} isLoading={isThinking} />
             </div>
         </div>
