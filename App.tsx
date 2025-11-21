@@ -39,33 +39,44 @@ function toLegalArabicOrdinal(num: number): string {
     const units = ["", "الأولى", "الثانية", "الثالثة", "الرابعة", "الخامسة", "السادسة", "السابعة", "الثامنة", "التاسعة"];
     
     if (num >= 1 && num <= 9) return units[num];
+    
     if (num === 10) return "العاشرة";
+    
     if (num >= 11 && num <= 19) {
         const idx = num - 10;
         const teensList = ["العاشرة", "الحادية عشرة", "الثانية عشرة", "الثالثة عشرة", "الرابعة عشرة", "الخامسة عشرة", "السادسة عشرة", "السابعة عشرة", "الثامنة عشرة", "التاسعة عشرة"];
         return teensList[idx];
     }
+
     const tens = ["", "العاشرة", "العشرون", "الثلاثون", "الأربعون", "الخمسون", "الستون", "السبعون", "الثمانون", "التسعون"];
+
     if (num >= 20 && num <= 99) {
         const unit = num % 10;
         const ten = Math.floor(num / 10);
         if (unit === 0) return tens[ten];
+        
         let unitStr = units[unit];
         if (unit === 1) unitStr = "الحادية"; 
+        
         return `${unitStr} و${tens[ten]}`;
     }
+
     if (num === 100) return "المائة";
+    
     if (num > 100 && num < 200) {
         const remainder = num - 100;
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد المائة`;
     }
+
     if (num === 200) return "المائتان";
+
     if (num > 200 && num < 300) {
         const remainder = num - 200;
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد المائتين`;
     }
+
     const hundredsMap: { [key: number]: string } = {
         300: "الثلاثمائة",
         400: "الأربعمائة",
@@ -75,14 +86,18 @@ function toLegalArabicOrdinal(num: number): string {
         800: "الثمانمائة",
         900: "التسعمائة"
     };
+
     if (num >= 300 && num < 1000) {
         const hundreds = Math.floor(num / 100) * 100;
         const remainder = num - hundreds;
         const hundredsStr = hundredsMap[hundreds];
+        
         if (remainder === 0) return hundredsStr;
+        
         const remainderStr = toLegalArabicOrdinal(remainder);
         return `${remainderStr} بعد ${hundredsStr}`;
     }
+    
     return num.toString();
 }
 
@@ -98,6 +113,7 @@ const App: React.FC = () => {
   
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  // Memoized full document text - Reverted to use this for full context
   const documentText = useMemo(() => {
     if (selectedDocs.length === 0) {
       return null;
@@ -208,6 +224,7 @@ const App: React.FC = () => {
     setApiError(null);
 
     try {
+      // Reverted to send full documentText instead of searching
       const stream = getChatResponse(documentText, text, messages);
       
       let isFirstChunk = true;
@@ -224,7 +241,6 @@ const App: React.FC = () => {
         } else {
             setMessages((prev) => {
                 const messageIndex = prev.findIndex(msg => msg.id === modelMessageId);
-                
                 if (messageIndex === -1) return prev; 
 
                 const newMessages = [...prev];
@@ -239,14 +255,7 @@ const App: React.FC = () => {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-      
-      // Handle 429/Quota errors in the UI catch block as well
-      if (errorMessage.includes('429') || errorMessage.includes('Quota exceeded') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-          setApiError("تجاوزت الحد المسموح، انتظر دقيقة ثم اسأل مرة أخرى");
-      } else {
-          const displayError = `عذرًا، حدث خطأ: ${errorMessage}`;
-          setApiError(displayError);
-      }
+      setApiError(errorMessage); // Display raw error as requested
       setIsThinking(false);
     }
   };
@@ -317,7 +326,7 @@ const App: React.FC = () => {
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-3">مرحباً، أنا محكم</h2>
                         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
-                            مساعدك القانوني. اسألني عن الأنظمة السعودية وسأجيبك بدقة مع الاستشهاد بالمواد النظامية.
+                            مساعدك القانوني الذكي. اسألني عن الأنظمة السعودية وسأجيبك بدقة مع الاستشهاد بالمواد النظامية.
                         </p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
@@ -325,9 +334,9 @@ const App: React.FC = () => {
                                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الحضانة</span>
                                  <span className="text-xs text-gray-400">"ما هي شروط الحضانة؟"</span>
                              </button>
-                             <button onClick={() => handleSendMessage("أذكر لي جميع المواد المتعلقة بالحجر والإفلاس")} className="group p-4 text-right bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-2xl transition-all shadow-sm hover:shadow-md">
-                                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الحجر والإفلاس</span>
-                                 <span className="text-xs text-gray-400">"أذكر لي جميع المواد المتعلقة بالحجر والإفلاس"</span>
+                             <button onClick={() => handleSendMessage("كيف يتم توزيع الميراث؟")} className="group p-4 text-right bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-2xl transition-all shadow-sm hover:shadow-md">
+                                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 block mb-1">الميراث</span>
+                                 <span className="text-xs text-gray-400">"كيف يتم توزيع الميراث؟"</span>
                              </button>
                         </div>
                     </div>
