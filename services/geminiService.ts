@@ -34,7 +34,6 @@ export async function* getChatResponse(pdfText: string, userQuery: string, histo
     2. **عدم الخروج عن النص (Anti-Hallucination):** لا تذكر معلومات قانونية أو مواد من أنظمة خارجية غير موجودة في النص المقدم لك أدناه. اعتمد فقط على ما هو موجود هنا.
     3. **عدم وجود إجابة:** فقط في حال كان السؤال بعيداً تماماً عن موضوع الأنظمة المتاحة، قل: "لا توجد إجابة على سؤالك في الأنظمة المتاحة حالياً".
     4. لا تتكلم ابدا من غير اقتباس من الأنظمة المتاحة.
-    5. لا تتكلم بالانجليزية أبدا إلا عند الضرورة الملحة
     
     قواعد الاقتباس (صارمة جداً):
     1. عند الاستشهاد بمعلومة، يجب ذكر المصدر بالتنسيق: (المصدر: [اسم النظام]، المادة [رقم المادة]).
@@ -67,6 +66,10 @@ export async function* getChatResponse(pdfText: string, userQuery: string, histo
         }
     }
 
-  
+  } catch (error: any) {
+    console.error("Error calling Gemini API:", error);
+    // Return the raw error message to the user as requested
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    yield `حدث خطأ أثناء الاتصال بالمساعد الذكي: ${errorMessage}`;
   }
 }
