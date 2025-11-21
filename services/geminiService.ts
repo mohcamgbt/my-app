@@ -67,15 +67,6 @@ export async function* getChatResponse(pdfText: string, userQuery: string, histo
         }
     }
 
-  } catch (error: any) {
-    console.error("Error calling Gemini API:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    
-    // Check for Quota Exceeded / Rate Limit errors
-    if (errorMessage.includes('429') || errorMessage.includes('RESOURCE_EXHAUSTED') || errorMessage.includes('Quota exceeded')) {
-        yield "تجاوزت الحد المسموح، انتظر دقيقة ثم اسأل مرة أخرى";
-    } else {
-        yield `حدث خطأ أثناء الاتصال بالمساعد الذكي: ${errorMessage}`;
-    }
+  
   }
 }
